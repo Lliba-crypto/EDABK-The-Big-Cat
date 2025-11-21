@@ -108,4 +108,4 @@ Just `printf` just like a normal C code. Result will appears in SWV ITM Data Con
 ## 1.8. Video
 
 
-[Insert video here...] as a proof of a successful hardware run.
+https://drive.google.com/drive/folders/1_tJJjdufixqz3SXSOdm4i1_hiw0CCb4u?usp=sharing 
