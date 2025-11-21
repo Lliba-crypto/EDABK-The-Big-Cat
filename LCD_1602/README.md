@@ -23,8 +23,8 @@
 | --- | --- | --- |
 | 1 | GND | GND |
 | 2 | VCC | 5V |
-| 3 | SDA | ... |
-| 4 | SCL | ... |
+| 3 | SDA | PB6 |
+| 4 | SCL | PB7 |
 
 ## 1.5. Configure .ioc in STM32CubeIDE
 
