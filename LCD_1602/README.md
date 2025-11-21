@@ -33,13 +33,11 @@
 - Set PB8 to I2C1_SCL
 - Set PB9 to I2C1_SDA
 
-## 1.6. Debug using SWV ITM Data Console
-
-## 1.7. Code
+## 1.6. Code
 
 **AFTER auto-code-generation from 1.5. Configure .ioc in STM32CubeIDE,**
 
-### 1.7.1. Adding Necessary Libraries
+### 1.6.1. Adding Necessary Libraries
 
 - Add liquidcrystal_i2c.h inside Core/Inc folder.
 - Add liquidcrystal_i2c.c inside Core/Inc folder.
@@ -50,7 +48,7 @@
     - `/* USER CODE BEGIN PFP */`
 - ...
 
-### 1.7.2. What are Needed Declaration & Function for `main.c`?
+### 1.6.2. What are Needed Declaration & Function for `main.c`?
 
 - Initialize LCD:
     - `LiquidCrystal_I2C lcd;`: create a sctruct variable
@@ -61,7 +59,7 @@
     - `LCD_SetCursor(&lcd, 0, 0);`: Set the cursor at the given point (example: 0,0 means the left top corner)        
     - `LCD_Print(&lcd, "Hello world!");`: Print at the current cursor
 
-## 1.8. Video
+## 1.7. Video
 
 
 https://drive.google.com/drive/folders/1_tJJjdufixqz3SXSOdm4i1_hiw0CCb4u?usp=sharing 
