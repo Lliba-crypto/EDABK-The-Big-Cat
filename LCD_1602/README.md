@@ -17,13 +17,7 @@
 
 ## 1.4. Hardware Connection
 
-### 1.4.1. Connect LK1 with LK2
-
-...
-
-**Note:** LK2 phải ... [Kèm hình ảnh vào cho rõ...].
-
-### 1.4.2. Connect LK1+LK2 with Microcontroller
+### Connect external component with Microcontroller
 
 | No. | LK1+LK2 | STM32F4 Discovery |
 | --- | --- | --- |
