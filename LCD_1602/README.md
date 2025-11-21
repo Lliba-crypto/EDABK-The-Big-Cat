@@ -97,13 +97,13 @@ Just `printf` just like a normal C code. Result will appears in SWV ITM Data Con
 ### 1.7.2. What are Needed Declaration & Function for `main.c`?
 
 - Initialize LCD:
-    - `LiquidCrystal_I2C lcd;`: ...
-    - `LCD_Init(&lcd, &hi2c1, 0x27, 16, 2);`: [Purpose?...]
+    - `LiquidCrystal_I2C lcd;`: create a sctruct variable
+    - `LCD_Init(&lcd, &hi2c1, 0x27, 16, 2);`: Initialize the LCD: assign handle I2C (hi2c1) -> assign the adress -> set the numbers of columns (16) and rows (2)
 - Application:
-    - `LCD_Clear(&lcd);`: ...
-    - `LCD_Backlight(&lcd);`: ...
-    - `LCD_SetCursor(&lcd, 0, 0);`: ...
-    - `LCD_Print(&lcd, "Hello world!");`: ...
+    - `LCD_Clear(&lcd);`: Delete the whole screen
+    - `LCD_Backlight(&lcd);`: Turn on the LED backlight
+    - `LCD_SetCursor(&lcd, 0, 0);`: Set the cursor at the given point (example: 0,0 means the left top corner)        
+    - `LCD_Print(&lcd, "Hello world!");`: Print at the current cursor
 
 ## 1.8. Video
 
