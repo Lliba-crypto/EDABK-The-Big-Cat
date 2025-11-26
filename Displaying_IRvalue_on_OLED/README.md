@@ -88,14 +88,17 @@ Just `printf` just like a normal C code. Result will appears in SWV ITM Data Con
 
 ### 1.7.1. Adding Necessary Libraries
 
-- Add liquidcrystal_i2c.h inside Core/Inc folder.
-- Add liquidcrystal_i2c.c inside Core/Inc folder.
+- Add ssd1306.c; ssd1306.h; ssd1306_font.c; ssd1306_fonts.h; ssd1306_conf.h inside Driver/OLED folder.
+- Add STM32F4xx_HAL_DRIVER inside Driver folder.
 - Change main.c at:
     - `/* Includes ------------------------------------------------------------------*/`
+      #include "main.h"
+      #include "ssd1306.h"
+      #include "ssd1306_fonts.h"
+      #include "stdio.h"
     - `/* USER CODE BEGIN Includes */`
     - `/* USER CODE BEGIN PV */`
     - `/* USER CODE BEGIN PFP */`
-- ...
 
 ### 1.7.2. What are Needed Declaration & Function for `main.c`?
 
@@ -103,10 +106,10 @@ Just `printf` just like a normal C code. Result will appears in SWV ITM Data Con
     - `LiquidCrystal_I2C lcd;`: ...
     - `LCD_Init(&lcd, &hi2c1, 0x27, 16, 2);`: [Purpose?...]
 - Application:
-    - `LCD_Clear(&lcd);`: ...
-    - `LCD_Backlight(&lcd);`: ...
-    - `LCD_SetCursor(&lcd, 0, 0);`: ...
-    - `LCD_Print(&lcd, "Hello world!");`: ...
+    - `ssd1306_Fill(SSD1306_COLOR color);`: Fill the screen with black color
+    - `ssd1306_SetCursor(uint8_t x, uint8_t y);`: Set cursor at (x,y) where it prints out string
+    - `ssd1306_WriteString(char* str, SSD1306_Font_t Font, SSD1306_COLOR color);`: Print string 'str' using font and color
+    - `ssd1306_UpdateScreen()`: ...
 
 ## 1.8. Video
 
