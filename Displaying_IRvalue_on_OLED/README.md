@@ -2,35 +2,37 @@
 
 ## 1.1. Deliverables
 
-- We want to display the string from microcontroller to LCD 1602
+- We want to display the ADC value to SSD1306
 - Debug: Test the display action using SWV ITM Data Console.
 
 ## 1.2. Hardware Needed
 
 1. STM32F4 Discovery Microcontroller
-2. LK1: [Màn hình LCD text LCD1602 xanh lá](https://hshop.vn/lcd-text-lcd1602-xanh-lo)
-3. LK2: [Mạch chuyển giao tiếp LCD1602, LCD1604, LCD2004 sang I2C](https://hshop.vn/mach-chuyen-giao-tiep-lcd1602-lcd1604-lcd2004-sang-i2c)
+2. LK1: [Màn hình OLED SSD1306 trắng](https://hshop.vn/lcd-oled-trang-0-96-inch-i2c)
+3. LK2: [Cảm biến hồng ngoại sử dụng LM393](
 
 ## 1.3. References
 
-- https://www.micropeta.com/video61
+- https://www.youtube.com/watch?v=z1Px6emHIeg&t=345s
 
 ## 1.4. Hardware Connection
 
-### 1.4.1. Connect LK1 with LK2
+### 1.4.1. Connect LK1 with Microcontroller
 
-...
-
-**Note:** LK2 phải ... [Kèm hình ảnh vào cho rõ...].
-
-### 1.4.2. Connect LK1+LK2 with Microcontroller
-
-| No. | LK1+LK2 | STM32F4 Discovery |
+| No. | LK1 | STM32F4 Discovery |
 | --- | --- | --- |
 | 1 | GND | GND |
 | 2 | VCC | 5V |
-| 3 | SDA | ... |
-| 4 | SCL | ... |
+| 3 | SDA | PB9 |
+| 4 | SCL | PB8 |
+
+### 1.4.2. Connect LK2 with Microcontroller
+
+| No. | LK1 | STM32F4 Discovery |
+| --- | --- | --- |
+| 1 | GND | GND |
+| 2 | VCC | 5V |
+| 3 | OUT | PA0 |
 
 ## 1.5. Configure .ioc in STM32CubeIDE
 
@@ -38,6 +40,7 @@
 - For I2C select I2C
 - Set PB8 to I2C1_SCL
 - Set PB9 to I2C1_SDA
+- Set PA) to ADC1_IN0
 
 ## 1.6. Debug using SWV ITM Data Console
 
