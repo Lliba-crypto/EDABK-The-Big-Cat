@@ -113,5 +113,4 @@ Just `printf` just like a normal C code. Result will appears in SWV ITM Data Con
 
 ## 1.8. Video
 
-
-[Insert video here...] as a proof of a successful hardware run.
+https://youtube.com/shorts/FKFbyf-zWnk
