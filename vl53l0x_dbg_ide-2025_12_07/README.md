@@ -32,6 +32,10 @@ In main.h:
 
 In `main.c`:
 ```cpp
+/* USER CODE BEGIN Includes */
+#include <stdio.h>
+/* USER CODE END Includes */
+
 /* USER CODE BEGIN 0 */
 uint16_t distance;
 /* USER CODE END 0 */
@@ -76,4 +80,5 @@ Nếu không detect được tường (vì **tường quá xa** so với sensor)
 
 <p align="center">
     <img src="pic/image.png" width="500">
+
 </p>
