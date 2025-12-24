@@ -148,9 +148,9 @@ int main(void)
       sprintf(buffer3, "%f", mouse.direction); // Convert direction to string
       ssd1306_WriteString(buffer3, Font_7x10, White);
 
-      ssd1306_SetCursor(30, 18);
-      ssd1306_WriteString("Dirt:", Font_7x10, White);
-      ssd1306_SetCursor(30, 9);
+      ssd1306_SetCursor(30, 27);
+      ssd1306_WriteString("Stage:", Font_7x10, White);
+      ssd1306_SetCursor(30, 27);
       sprintf(buffer4, "%d", stage); // Convert direction to string
       ssd1306_WriteString(buffer4, Font_7x10, White);
 
@@ -673,3 +673,4 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
+
