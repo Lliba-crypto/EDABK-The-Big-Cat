@@ -1,9 +1,17 @@
 #include "map_track_alg.h"
-
+#include "ssd1306.h"
+#include "drv8833.h"
+#include "ssd1306_fonts.h"
+#include "vl53l0x.h"
 /* NESW */
 const int DELTA_X[4] = {0, 1, 0, -1};
 const int DELTA_Y[4] = {-1, 0, 1, 0};
-
+#define FLT_TEXT_SIZE (1 + 1 + 1 +    8   + 1 + 1 + 5   + 1)
+char buffer1[FLT_TEXT_SIZE],buffer2[FLT_TEXT_SIZE], buffer3[FLT_TEXT_SIZE], buffer4[FLT_TEXT_SIZE];
+statInfo_t_VL53L0X sensorFront, sensorLeft, sensorRight;
+mouse_type mouse;
+cell_type maze[MAZE_SIZE][MAZE_SIZE];
+int stage = 0;
 /* Ground-truth maze */
 cell_type REAL_MAZE[MAZE_SIZE][MAZE_SIZE] =
 {
@@ -215,11 +223,6 @@ void fetchMouseData(mouse_type mouse)
     printf("\n");
 }
 
-int readSensor(mouse_type *mouse)
-{
-    return REAL_MAZE[mouse->y][mouse->x].wall;
-}
-
 void forward(mouse_type *mouse)
 {
     printf("Gone to x: %i y:%i\n", mouse->x, mouse->y);
@@ -228,16 +231,53 @@ void forward(mouse_type *mouse)
     if (d >= 2.5f && d <= 3.5f) mouse->y++; // S
     if (d >= 1.5f && d <= 2.5f) mouse->x++; // E
     if ((d >= 3.5f && d <= 4.0f) || (d >= 0.0f && d <= 0.5f)) mouse->x--; // W
+
+    ssd1306_Fill(Black);               // xoa man hinh
+
+    ssd1306_SetCursor(1, 0);
+    ssd1306_WriteString("Cell:", Font_7x10, White);
+    ssd1306_SetCursor(30, 0);
+    sprintf(buffer1, "%u", maze[mouse->y][mouse->x].wall); // Convert cell to string
+    ssd1306_WriteString(buffer1, Font_7x10, White);
+
+    ssd1306_SetCursor(1, 9);
+    ssd1306_WriteString("Coor:", Font_7x10, White);
+    ssd1306_SetCursor(30, 9);
+    sprintf(buffer2, "(%d,%d)", mouse->x, mouse->y); // Convert x, y to string
+    ssd1306_WriteString(buffer2, Font_7x10, White);
+
+    ssd1306_SetCursor(1, 18);
+    ssd1306_WriteString("Dirt:", Font_7x10, White);
+    ssd1306_SetCursor(30, 18);
+    sprintf(buffer3, "%f", mouse->direction); // Convert direction to string
+    ssd1306_WriteString(buffer3, Font_7x10, White);
+
+    ssd1306_SetCursor(1, 27);
+    ssd1306_WriteString("Stage:", Font_7x10, White);
+    ssd1306_SetCursor(30, 27);
+    sprintf(buffer4, "%d", stage); // Convert direction to string
+    ssd1306_WriteString(buffer4, Font_7x10, White);
+
+    ssd1306_UpdateScreen();
+
+    RightMotor_SetSpeed(78);   // Motor A chạy thuận 78%
+    LeftMotor_SetSpeed(78);  // Motor B chạy nghịch 78%
+
+    Update_Encoder_Speeds(); // Theo dõi omegaA, omegaB trong Live Expressions
+    HAL_Delay(FORWARD_TIME);
 }
+
 
 void turnRight(mouse_type *mouse, float direction)
 {
-    mouse->direction = fmodf(mouse->direction + direction, 4.0f);
+    rightTurn();
+	mouse->direction = fmodf(mouse->direction + direction, 4.0f);
     if (mouse->direction < 0.0f) mouse->direction += 4.0f;
 }
 
 void turnLeft(mouse_type *mouse, float direction)
 {
+	leftTurn();
     mouse->direction = fmodf(mouse->direction - direction, 4.0f);
     if (mouse->direction < 0.0f) mouse->direction += 4.0f;
 }
@@ -269,6 +309,48 @@ void setWall(cell_type maze[][MAZE_SIZE], mouse_type *mouse)
     int x = mouse->x, y = mouse->y;
     maze[y][x].known = true;
     maze[y][x].wall = (uint8_t) readSensor(mouse);
+}
+
+int readSensor(mouse_type *mouse)
+{
+    uint8_t wall = 0x00;
+
+    uint16_t front = readRangeSingleMillimeters(&sensorFront);
+    uint16_t left  = readRangeSingleMillimeters(&sensorLeft);
+    uint16_t right = readRangeSingleMillimeters(&sensorRight);
+
+    // Ngưỡng xác định có tường (ví dụ < 7 mm)
+    const uint16_t THRESHOLD = 7;
+
+
+    switch ((int)mouse->direction) {
+        case 1: // North
+            if (front < THRESHOLD) wall |= (1 << 3); // North
+            if (right < THRESHOLD) wall |= (1 << 2); // East
+            if (left  < THRESHOLD) wall |= (1 << 0); // West
+            break;
+
+        case 2: // East
+            if (front < THRESHOLD) wall |= (1 << 2); // East
+            if (right < THRESHOLD) wall |= (1 << 1); // South
+            if (left  < THRESHOLD) wall |= (1 << 3); // North
+            break;
+
+        case 3: // South
+            if (front < THRESHOLD) wall |= (1 << 1); // South
+            if (right < THRESHOLD) wall |= (1 << 0); // West
+            if (left  < THRESHOLD) wall |= (1 << 2); // East
+            break;
+
+        case 4: // West
+        case 0: // West (wrap-around)
+            if (front < THRESHOLD) wall |= (1 << 0); // West
+            if (right < THRESHOLD) wall |= (1 << 3); // North
+            if (left  < THRESHOLD) wall |= (1 << 1); // South
+            break;
+    }
+
+    return wall;
 }
 
 int findPath(cell_type maze[][MAZE_SIZE], int sx, int sy, int gx, int gy)
@@ -388,6 +470,113 @@ point_type findNearestUnknown(cell_type maze[][MAZE_SIZE], int x, int y)
 void returnToStart(cell_type maze[][MAZE_SIZE], mouse_type *mouse)
 {
     goTo(maze, mouse, 0, 0);
+}
+
+int findOptimalPath(cell_type maze[][MAZE_SIZE], int sx, int sy, int gx, int gy)
+{
+	#define TURN_PENALTY 10
+	#define INT_MAX 5 // giả định
+	for (int y = 0; y < MAZE_SIZE; y++)
+    {
+        for (int x = 0; x < MAZE_SIZE; x++)
+        {
+            maze[y][x].previous_point = (point_type){-1, -1};
+            for(int d = 0; d<4; d++) maze[y][x].cost[d] = UINT16_MAX;
+        }
+    }
+
+    struct { uint8_t x, y, dir; } queue[MAZE_SIZE * MAZE_SIZE * 4];
+    int head = 0, tail = 0;
+
+    for (int d = 0; d < 4; d++) {
+        maze[sy][sx].cost[d] = 0;
+        queue[tail++] = (typeof(queue[0])){sx, sy, d};
+    }
+
+    while (head != tail)
+    {
+        uint8_t cx = queue[head].x;
+        uint8_t cy = queue[head].y;
+        uint8_t cd = queue[head].dir;
+        head = (head + 1) % (MAZE_SIZE * MAZE_SIZE * 4);
+
+        for (int nextDir = 0; nextDir < 4; nextDir++) {
+            // Wall check
+            if ((maze[cy][cx].wall >> (3 - nextDir)) & 1) continue;
+
+            int nx = cx + DELTA_X[nextDir];
+            int ny = cy + DELTA_Y[nextDir];
+
+            if (isValid(nx, ny) && (maze[ny][nx].known || (nx == gx && ny == gy))) {
+                // Logic: If new route is shorter than recorded, update and queue neighbors
+                int weight = (nextDir == cd) ? 1 : (1 + TURN_PENALTY);
+                int newDist = maze[cy][cx].cost[cd] + weight;
+
+                if (newDist < maze[ny][nx].cost[nextDir]) {
+                    maze[ny][nx].cost[nextDir] = newDist;
+                    maze[ny][nx].previous_point = (point_type){cx, cy};
+
+                    // Add to queue for propagation
+                    queue[tail] = (typeof(queue[0])){ (uint8_t)nx, (uint8_t)ny, (uint8_t)nextDir };
+                    tail = (tail + 1) % (MAZE_SIZE * MAZE_SIZE * 4);
+                }
+            }
+        }
+    }
+
+    // Return the cheapest cost among all directions at goal
+    int minGoalCost = INT_MAX;
+    for (int d = 0; d < 4; d++) {
+        if (maze[gy][gx].cost[d] < minGoalCost) minGoalCost = maze[gy][gx].cost[d];
+    }
+
+    return (minGoalCost >= INT_MAX) ? -1 : minGoalCost;
+}
+
+
+void goToOptimal(cell_type maze[][MAZE_SIZE], mouse_type *mouse, int gx, int gy)
+{
+    int total_cost = findOptimalPath(maze, mouse->x, mouse->y, gx, gy);
+
+    if (total_cost == -1) return;
+
+    point_type path[MAZE_SIZE * MAZE_SIZE];
+    int count = 0;
+
+    int x = gx, y = gy;
+    path[count++] = (point_type){x, y};
+
+    while (x != mouse->x || y != mouse->y)
+    {
+        point_type p = maze[y][x].previous_point;
+
+        if (p.x == -1 || p.y == -1) break;
+
+        path[count++] = p;
+        x = p.x;
+        y = p.y;
+    }
+
+    for (int i = count - 2; i >= 0; i--)
+    {
+        point_type next = path[i];
+        int dx = next.x - mouse->x;
+        int dy = next.y - mouse->y;
+
+        int dir = -1; // 0=N, 1=E, 2=S, 3=W
+        if      (dx ==  0 && dy == -1) dir = 0; // North
+        else if (dx ==  1 && dy ==  0) dir = 1; // East
+        else if (dx ==  0 && dy ==  1) dir = 2; // South
+        else if (dx == -1 && dy ==  0) dir = 3; // West
+
+        if (dir != -1)
+        {
+            rotateTo(mouse, (float)dir + 1);
+            forward(mouse);
+
+            setWall(maze, mouse);
+        }
+    }
 }
 
 void calculateRoute(cell_type maze[][MAZE_SIZE], mouse_type *mouse)

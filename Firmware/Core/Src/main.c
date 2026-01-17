@@ -25,6 +25,10 @@
 #include "map_track_alg.h"
 #include "../../Drivers/SSD1306/ssd1306.h"
 #include "../../Drivers/SSD1306/ssd1306_fonts.h"
+#include "drv8833.h"
+#include "mpu6050.h"
+#include "Encoder.h"
+#include "vl53l0x.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -76,7 +80,8 @@ static void MX_TIM5_Init(void);
 /* USER CODE BEGIN 0 */
 static int counter = 0;
 #define FLT_TEXT_SIZE (1 + 1 + 1 +    8   + 1 + 1 + 5   + 1)
-
+MPU6050_Raw Raw;
+MPU6050_Data Angle;
 /* USER CODE END 0 */
 
 /**
@@ -104,10 +109,6 @@ int main(void)
 
   /* USER CODE BEGIN SysInit */
 
-  MX_GPIO_Init();         // Initialize GPIO (if needed)
-
-  /* USER CODE END SysInit */
-
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_TIM1_Init();
@@ -119,69 +120,60 @@ int main(void)
   MX_I2C3_Init();
   MX_TIM5_Init();
   ssd1306_Init();      // SSD1306 initialize
+  MPU6050_Init();
+  initVL53L0X(1, &hi2c1);
+  initVL53L0X(1, &hi2c2);
+  initVL53L0X(1, &hi2c3);
+
+
+  /* USER CODE END SysInit */
+
   /* USER CODE BEGIN 2 */
 
   // Variables declaration
-	  char buffer1[FLT_TEXT_SIZE],buffer2[FLT_TEXT_SIZE], buffer3[FLT_TEXT_SIZE], buffer4[FLT_TEXT_SIZE];
   	  mouse_type mouse;
       cell_type maze[MAZE_SIZE][MAZE_SIZE];
       int stage = 0;
-
       initMouseMaze(&mouse, maze);
-      ssd1306_Fill(Black);               // xoa man hinh
-
-      ssd1306_SetCursor(1, 0);
-      ssd1306_WriteString("Cell:", Font_7x10, White);
-      ssd1306_SetCursor(30, 0);
-      sprintf(buffer1, "%u", maze[mouse.y][mouse.x].wall); // Convert cell to string
-      ssd1306_WriteString(buffer1, Font_7x10, White);
-
-      ssd1306_SetCursor(30, 9);
-      ssd1306_WriteString("Coor:", Font_7x10, White);
-      ssd1306_SetCursor(30, 9);
-      sprintf(buffer2, "(%d,%d)", mouse.x, mouse.y); // Convert x, y to string
-      ssd1306_WriteString(buffer2, Font_7x10, White);
-
-      ssd1306_SetCursor(30, 18);
-      ssd1306_WriteString("Dirt:", Font_7x10, White);
-      ssd1306_SetCursor(30, 9);
-      sprintf(buffer3, "%f", mouse.direction); // Convert direction to string
-      ssd1306_WriteString(buffer3, Font_7x10, White);
-
-      ssd1306_SetCursor(30, 27);
-      ssd1306_WriteString("Stage:", Font_7x10, White);
-      ssd1306_SetCursor(30, 27);
-      sprintf(buffer4, "%d", stage); // Convert direction to string
-      ssd1306_WriteString(buffer4, Font_7x10, White);
-
-      ssd1306_UpdateScreen();
-
-
-
-      MotorA_SetSpeed(50);   // Motor A chạy thuận 50%
-      MotorB_SetSpeed(-30);  // Motor B chạy nghịch 30%
-
-      Update_Encoder_Speeds(); // Theo dõi omegaA, omegaB trong Live Expressions
-      HAL_Delay(SAMPLE_TIME_MS);
-
-      // Single call: explore() now contains the full exploration loop
-      stage = 1;
-      explore(maze, &mouse);
-
-      // Make the mouse go back to the start
-      stage = 2;
-      returnToStart(maze, &mouse);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+  while (1){
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
 
+	// Đọc trạng thái nút PA12
+    if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_12) == GPIO_PIN_RESET){
+    	HAL_Delay(200); // chống dội phím
+    	stage = (stage + 1) % 4; // chuyển sang chế độ tiếp theo
+	}
+
+    // Thực hiện hành động theo stage
+    switch (stage){
+	case 0:
+		// Standby / chờ lệnh
+		break;
+	case 1:
+	    // Single call: explore() now contains the full exploration loop
+	    explore(maze, &mouse);
+	    break;
+	case 2:
+		// Make the mouse go back to the start
+	    returnToStart(maze, &mouse);
+	    break;
+    case 3:
+    	// Make the mouse go to the center
+	    goToOptimal(maze, &mouse, 8, 8);
+	    break;
+	}
+
+	  MPU6050_Read_Data(&Raw);
+	  MPU6050_Read_Angle(&Angle);
+
+	  HAL_Delay(100);
 
 	  counter++;          // Increment counter
       HAL_Delay(1000);    // Wait 1000 ms = 1 second
@@ -673,4 +665,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-

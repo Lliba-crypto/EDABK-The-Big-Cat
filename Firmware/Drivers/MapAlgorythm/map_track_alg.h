@@ -10,10 +10,12 @@
 
 // ===== CONSTANTS =====
 #define MAZE_SIZE 16
+#define TURN_PENALTY 10
 
 extern const int DELTA_X[4];                            // direction NESW of mouse
 extern const int DELTA_Y[4];                            // direction NESW of mouse
 
+extern int stage;
 // ===== USER-DEFINED DATA TYPES =====
 typedef struct 
 { 
@@ -32,6 +34,7 @@ typedef struct
     bool     known;         // cell_type discovered
     uint16_t dist;          // BFS distance
     point_type    previous_point;
+    uint16_t cost[4];       // Optimal distance
 } cell_type;
 
 extern cell_type REAL_MAZE[MAZE_SIZE][MAZE_SIZE]; // Ground-truth maze (unchanged from your data)
@@ -70,5 +73,6 @@ point_type  findNearestUnknown (cell_type maze[][MAZE_SIZE], int x, int y);
 void   returnToStart           (cell_type maze[][MAZE_SIZE], mouse_type *mouse);
 void   calculateRoute          (cell_type maze[][MAZE_SIZE], mouse_type *mouse);
 void   renderMaze              (cell_type maze[][MAZE_SIZE]);
-
+void   goToOptimal(cell_type maze[][MAZE_SIZE], mouse_type *mouse, int gx, int gy);
+int    findOptimalPath(cell_type maze[][MAZE_SIZE], int sx, int sy, int gx, int gy);
 #endif /* MAP_TRACK_ALG_H */
