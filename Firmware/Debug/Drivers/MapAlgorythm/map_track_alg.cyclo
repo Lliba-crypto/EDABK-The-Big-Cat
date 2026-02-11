@@ -1,0 +1,17 @@
+../Drivers/MapAlgorythm/map_track_alg.c:134:6:initMouseMaze	3
+../Drivers/MapAlgorythm/map_track_alg.c:164:6:explore	9
+../Drivers/MapAlgorythm/map_track_alg.c:207:6:fetchMouseData	10
+../Drivers/MapAlgorythm/map_track_alg.c:226:6:forward	11
+../Drivers/MapAlgorythm/map_track_alg.c:271:6:turnRight	2
+../Drivers/MapAlgorythm/map_track_alg.c:278:6:turnLeft	2
+../Drivers/MapAlgorythm/map_track_alg.c:285:6:rotateTo	7
+../Drivers/MapAlgorythm/map_track_alg.c:302:6:isValid	5
+../Drivers/MapAlgorythm/map_track_alg.c:307:6:setWall	1
+../Drivers/MapAlgorythm/map_track_alg.c:357:5:findPath	13
+../Drivers/MapAlgorythm/map_track_alg.c:401:6:goTo	15
+../Drivers/MapAlgorythm/map_track_alg.c:443:12:findNearestUnknown	7
+../Drivers/MapAlgorythm/map_track_alg.c:471:6:returnToStart	1
+../Drivers/MapAlgorythm/map_track_alg.c:476:5:findOptimalPath	17
+../Drivers/MapAlgorythm/map_track_alg.c:538:6:goToOptimal	16
+../Drivers/MapAlgorythm/map_track_alg.c:583:6:calculateRoute	1
+../Drivers/MapAlgorythm/map_track_alg.c:587:6:renderMaze	9
