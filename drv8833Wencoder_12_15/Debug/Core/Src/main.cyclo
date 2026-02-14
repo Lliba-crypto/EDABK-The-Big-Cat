@@ -1,0 +1,12 @@
+../Core/Src/main.c:80:6:Motor_Init	1
+../Core/Src/main.c:99:6:MotorA_SetSpeed	2
+../Core/Src/main.c:112:6:MotorB_SetSpeed	2
+../Core/Src/main.c:125:6:Update_Encoder_Speeds	1
+../Core/Src/main.c:146:5:main	1
+../Core/Src/main.c:217:6:SystemClock_Config	3
+../Core/Src/main.c:264:13:MX_TIM1_Init	3
+../Core/Src/main.c:314:13:MX_TIM2_Init	7
+../Core/Src/main.c:377:13:MX_TIM3_Init	3
+../Core/Src/main.c:426:13:MX_TIM4_Init	5
+../Core/Src/main.c:479:13:MX_GPIO_Init	1
+../Core/Src/main.c:503:6:Error_Handler	1
