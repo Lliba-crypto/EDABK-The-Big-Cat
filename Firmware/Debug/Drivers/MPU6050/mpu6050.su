@@ -1,3 +1,0 @@
-../Drivers/MPU6050/mpu6050.c:47:6:MPU6050_Init	32	static
-../Drivers/MPU6050/mpu6050.c:86:6:MPU6050_Read_Data	56	static
-../Drivers/MPU6050/mpu6050.c:154:6:MPU6050_Read_Angle	88	static
