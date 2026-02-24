@@ -1,0 +1,14 @@
+../Core/Src/drv8833.c:38:6:DRV8833_Init	8	static
+../Core/Src/drv8833.c:57:6:lockInterruptDisable_TIM3	8	static
+../Core/Src/drv8833.c:61:6:lockInterruptEnable_TIM3	8	static
+../Core/Src/drv8833.c:65:6:lockInterruptDisable_TIM4	8	static
+../Core/Src/drv8833.c:69:6:lockInterruptEnable_TIM4	8	static
+../Core/Src/drv8833.c:73:6:resetGyroAngle	4	static
+../Core/Src/drv8833.c:78:6:RightMotor_SetSpeed	24	static
+../Core/Src/drv8833.c:90:6:RightMotor_Stop	4	static
+../Core/Src/drv8833.c:97:6:LeftMotor_SetSpeed	24	static
+../Core/Src/drv8833.c:109:6:LeftMotor_Stop	4	static
+../Core/Src/drv8833.c:115:6:Motor_Stop	4	static
+../Core/Src/drv8833.c:124:6:moveOneCell	32	static
+../Core/Src/drv8833.c:163:6:rightTurn	8	static
+../Core/Src/drv8833.c:195:6:leftTurn	8	static
